@@ -1,13 +1,15 @@
 <?php
-class loginController extends controller {
+class loginController extends controller
+{
 
-	public function index() {
+	public function index()
+	{
 		$data = array(
 			'msg' => ''
 		);
 
-		if(!empty($_GET['error'])) {
-			if($_GET['error'] == '1') {
+		if (!empty($_GET['error'])) {
+			if ($_GET['error'] == '1') {
 				$data['msg'] = 'Usuário e/ou senha inválidos!';
 			}
 		}
@@ -15,43 +17,46 @@ class loginController extends controller {
 		$this->loadView('login', $data);
 	}
 
-	public function signin() {
+	public function signin()
+	{
 
-		if(!empty($_POST['username'])) {
+		if (!empty($_POST['username'])) {
 			$username = strtolower($_POST['username']);
 			$pass = $_POST['pass'];
 
 			$users = new Users();
-			if($users->validateUser($username, $pass)) {
-				header("Location: ".BASE_URL);
+			if ($users->validateUser($username, $pass)) {
+				header("Location: " . BASE_URL);
 				exit;
 			} else {
-				header("Location: ".BASE_URL.'login?error=1');
+				header("Location: " . BASE_URL . 'login?error=1');
 				exit;
 			}
 		} else {
-			header("Location: ".BASE_URL.'login');
+			header("Location: " . BASE_URL . 'login');
 			exit;
 		}
-
 	}
 
-	public function signup() {
+	public function signup()
+	{
 		$data = array(
 			'msg' => ''
 		);
 
-		if(!empty($_POST['username'])) {
+		if (!empty($_POST['username'])) {
 			$username = strtolower($_POST['username']);
-			$pass = $_POST['pass'];
+			$pass = addslashes($_POST['pass']);
+			$cpf = addslashes($_POST['cpf']);
+			$email = addslashes($_POST['email']);
 
 			$users = new Users();
 
-			if($users->validateUsername($username)) {
-				if(!$users->userExists($username)) {
-					$users->registerUser($username, $pass);
+			if ($users->validateUsername($username)) {
+				if (!$users->userExists($username)) {
+					$users->registerUser($username, $pass, $cpf, $email);
 
-					header("Location: ".BASE_URL."login");
+					header("Location: " . BASE_URL . "login");
 				} else {
 					$data['msg'] = 'Usuário já existente!';
 				}
@@ -63,27 +68,11 @@ class loginController extends controller {
 		$this->loadView('signup', $data);
 	}
 
-	public function logout() {
+	public function logout()
+	{
 		$users = new Users();
 		$users->clearLoginHash();
 
-		header("Location: ".BASE_URL.'login');
+		header("Location: " . BASE_URL . 'login');
 	}
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

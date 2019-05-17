@@ -1,10 +1,12 @@
 <?php
-class Users extends Model {
+class Users extends Model
+{
 
 	private $uid;
 
-	public function verifyLogin() {
-		if(!empty($_SESSION['chathashlogin'])) {
+	public function verifyLogin()
+	{
+		if (!empty($_SESSION['chathashlogin'])) {
 			$s = $_SESSION['chathashlogin'];
 
 			$sql = "SELECT * FROM users WHERE loginhash = :hash";
@@ -12,7 +14,7 @@ class Users extends Model {
 			$sql->bindValue(":hash", $s);
 			$sql->execute();
 
-			if($sql->rowCount() > 0) {
+			if ($sql->rowCount() > 0) {
 				$data = $sql->fetch();
 				$this->uid = $data['id'];
 
@@ -25,85 +27,89 @@ class Users extends Model {
 		}
 	}
 
-	public function validateUsername($u) {
-		if(preg_match('/^[a-z0-9]+$/', $u)) {
+	public function validateUsername($u)
+	{
+		if (preg_match('/^[a-z0-9]+$/', $u)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public function userExists($u) {
+	public function userExists($u)
+	{
 
 		$sql = "SELECT * FROM users WHERE username = :u";
 		$sql = $this->db->prepare($sql);
 		$sql->bindValue(":u", $u);
 		$sql->execute();
 
-		if($sql->rowCount() > 0) {
+		if ($sql->rowCount() > 0) {
 			return true;
 		} else {
 			return false;
 		}
-
 	}
 
-	public function registerUser($username, $pass) {
+	public function registerUser($username, $pass, $cpf, $email)
+	{
 		$newpass = password_hash($pass, PASSWORD_DEFAULT);
 
-		$sql = "INSERT INTO users (username, pass) VALUES (:u, :p)";
+		$sql = "INSERT INTO users (username, pass, cpf, email) VALUES (:u, :p, :c, :e)";
 		$sql = $this->db->prepare($sql);
 		$sql->bindValue(":u", $username);
 		$sql->bindValue(":p", $newpass);
+		$sql->bindValue(":c", $cpf);
+		$sql->bindValue(":e", $email);
 		$sql->execute();
 	}
 
-	public function validateUser($username, $pass) {
+	public function validateUser($username, $pass)
+	{
 
 		$sql = "SELECT * FROM users WHERE username = :username";
 		$sql = $this->db->prepare($sql);
 		$sql->bindValue(":username", $username);
 		$sql->execute();
 
-		if($sql->rowCount() > 0) {
+		if ($sql->rowCount() > 0) {
 			$info = $sql->fetch();
 
-			if(password_verify($pass, $info['pass'])) {
-				$loginhash = md5(rand(0,99999).time().$info['id'].$info['username']);
+			if (password_verify($pass, $info['pass'])) {
+				$loginhash = md5(rand(0, 99999) . time() . $info['id'] . $info['username']);
 
 				$this->setLoginHash($info['id'], $loginhash);
 				$_SESSION['chathashlogin'] = $loginhash;
 
 				return true;
-
 			} else {
 				return false;
 			}
-
 		} else {
 			return false;
 		}
-
 	}
 
-	private function setLoginHash($uid, $hash) {
+	private function setLoginHash($uid, $hash)
+	{
 
 		$sql = "UPDATE users SET loginhash = :hash WHERE id = :id";
 		$sql = $this->db->prepare($sql);
 		$sql->bindValue(":hash", $hash);
 		$sql->bindValue(":id", $uid);
 		$sql->execute();
-
 	}
 
-	public function clearLoginHash() {
+	public function clearLoginHash()
+	{
 		$_SESSION['chathashlogin'] = '';
 	}
 
-	public function updateGroups($groups) {
+	public function updateGroups($groups)
+	{
 		$groupstring = '';
-		if(count($groups) > 0) {
-			$groupstring = '!'.implode('!', $groups).'!';
+		if (count($groups) > 0) {
+			$groupstring = '!' . implode('!', $groups) . '!';
 		}
 
 		$sql = "UPDATE users SET last_update = NOW(), groups = :groups WHERE id = :id";
@@ -113,23 +119,25 @@ class Users extends Model {
 		$sql->execute();
 	}
 
-	public function clearGroups() {
+	public function clearGroups()
+	{
 		$sql = "UPDATE users SET groups = '' WHERE last_update < DATE_ADD(NOW(), INTERVAL -2 MINUTE)";
 		$this->db->query($sql);
 	}
 
-	public function getUsersInGroup($group) {
+	public function getUsersInGroup($group)
+	{
 		$array = array();
 
 		$sql = "SELECT username FROM users WHERE groups LIKE :groups";
 		$sql = $this->db->prepare($sql);
-		$sql->bindValue(':groups', '%!'.$group.'!%');
+		$sql->bindValue(':groups', '%!' . $group . '!%');
 		$sql->execute();
 
-		if($sql->rowCount() > 0) {
+		if ($sql->rowCount() > 0) {
 			$list = $sql->fetchAll(PDO::FETCH_ASSOC);
 
-			foreach($list as $item) {
+			foreach ($list as $item) {
 				$array[] = $item['username'];
 			}
 		}
@@ -137,7 +145,8 @@ class Users extends Model {
 		return $array;
 	}
 
-	public function getCurrentGroups() {
+	public function getCurrentGroups()
+	{
 		$array = array();
 
 		$sql = "SELECT groups FROM users WHERE id = :id";
@@ -147,7 +156,7 @@ class Users extends Model {
 		$sql = $sql->fetch();
 
 		$array = explode('!', $sql['groups']);
-		if(count($array) > 0) {
+		if (count($array) > 0) {
 			array_pop($array);
 			array_shift($array);
 
@@ -158,18 +167,20 @@ class Users extends Model {
 		return $array;
 	}
 
-	public function getUid() {
+	public function getUid()
+	{
 		return $this->uid;
 	}
 
-	public function getName() {
+	public function getName()
+	{
 
 		$sql = "SELECT username FROM users WHERE id = :id";
 		$sql = $this->db->prepare($sql);
 		$sql->bindValue(":id", $this->uid);
 		$sql->execute();
 
-		if($sql->rowCount() > 0) {
+		if ($sql->rowCount() > 0) {
 			$data = $sql->fetch();
 
 			return $data['username'];
@@ -177,16 +188,4 @@ class Users extends Model {
 
 		return '';
 	}
-
-
-
 }
-
-
-
-
-
-
-
-
-

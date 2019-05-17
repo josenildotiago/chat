@@ -10,12 +10,12 @@ function addGroupModal() {
 	$('.modal_area').html(html);
 	$('.modal_bg').show();
 
-	$('#newGroupButton').on('click', function(){
+	$('#newGroupButton').on('click', function () {
 		var newGroupName = $('#newGroupName').val();
 
-		if(newGroupName != '') {
-			chat.addNewGroup(newGroupName, function(json){
-				if(json.error == '0') {
+		if (newGroupName != '') {
+			chat.addNewGroup(newGroupName, function (json) {
+				if (json.error == '0') {
 					$('.add_tab').click();
 				} else {
 					alert(json.errorMsg);
@@ -28,10 +28,10 @@ function fecharModal() {
 	$('.modal_bg').hide();
 }
 
-$(function(){
+$(function () {
 
-	if(group_list.length > 0) {
-		for(var i in group_list) {
+	if (group_list.length > 0) {
+		for (var i in group_list) {
 			chat.setGroup(group_list[i].id, group_list[i].name);
 		}
 	}
@@ -39,7 +39,7 @@ $(function(){
 	chat.chatActivity();
 	chat.userListActivity();
 
-	$('.add_tab').on('click', function(){
+	$('.add_tab').on('click', function () {
 
 		var html = '<h1>Escolha uma sala de Bate Papo</h1>';
 		html += '<div id="groupList">Carregando...</div>';
@@ -50,14 +50,14 @@ $(function(){
 		$('.modal_area').html(html);
 		$('.modal_bg').show();
 
-		chat.loadGroupList(function(json){
+		chat.loadGroupList(function (json) {
 			var html = '';
-			for(var i in json.list) {
-				html += '<button data-id="'+json.list[i].id+'">'+json.list[i].name+'</button>';
+			for (var i in json.list) {
+				html += '<button data-id="' + json.list[i].id + '">' + json.list[i].name + '</button>';
 			}
 			$('#groupList').html(html);
 
-			$('#groupList').find('button').on('click', function(){
+			$('#groupList').find('button').on('click', function () {
 				var cid = $(this).attr('data-id');
 				var cnm = $(this).text();
 
@@ -69,18 +69,18 @@ $(function(){
 		});
 	});
 
-	$('nav ul').on('click', 'li .group_name', function(){
+	$('nav ul').on('click', 'li .group_name', function () {
 		var id = $(this).parent().attr('data-id');
 		chat.setActiveGroup(id);
 	});
 
-	$('nav ul').on('click', 'li .group_close', function(){
+	$('nav ul').on('click', 'li .group_close', function () {
 		var id = $(this).parent().attr('data-id');
 		chat.removeGroup(id);
 	});
 
-	$('#sender_input').on('keyup', function(e){
-		if(e.keyCode == 13) {
+	$('#sender_input').on('keyup', function (e) {
+		if (e.keyCode == 13) {
 			var msg = $(this).val();
 			$(this).val('');
 
@@ -88,17 +88,23 @@ $(function(){
 		}
 	});
 
-	$('.imgUploadBtn').on('click', function(){
+	$('.imgUploadBtn').on('click', function () {
 		$('#sender_input_img').trigger('click');
 	});
 
-	$('#sender_input_img').on('change', function(e){
-		chat.sendPhoto( e.target.files[0] );
+	$('#sender_input_img').on('change', function (e) {
+		chat.sendPhoto(e.target.files[0]);
 	});
 
-	$(".img-sand").click(function(){
+	$(".img-sand").click(function () {
 		var msg = $('#sender_input').val();
-			$('#sender_input').val('');
-			chat.sendMessage(msg);
+		$('#sender_input').val('');
+		chat.sendMessage(msg);
 	});
+});
+
+$(function () {
+	$("#data").mask("00/00/0000")
+	$("#cep").mask("00000-000")
+	$("#cpf").mask("000.000.000-00")
 });

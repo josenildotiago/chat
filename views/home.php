@@ -3,11 +3,11 @@
 		<div class="progressbar" style="width:0%"></div>
 	</div>
 	<div class="userinfo">
-		Logado como: <strong><?php echo $name; ?></strong> - <a href="<?php echo BASE_URL; ?>login/logout">Sair</a>
+		Logado como: <strong><?php echo ucfirst($name); ?></strong> - <a href="<?php echo BASE_URL; ?>login/logout">Sair</a>
 	</div>
 	<nav>
 		<ul>
-			
+
 		</ul>
 		<button class="add_tab">+</button>
 	</nav>
@@ -15,7 +15,7 @@
 		<div class="messages"></div>
 		<div class="user_list">
 			<ul>
-				
+
 			</ul>
 		</div>
 	</section>
@@ -31,7 +31,7 @@
 				<div class="sender_tool imgUploadBtn">
 					<img class="img-foto" src="<?php echo BASE_URL; ?>assets/font/cam1.png" alt="Upload Imagem">
 				</div>
-				
+
 			</div>
 		</div>
 
